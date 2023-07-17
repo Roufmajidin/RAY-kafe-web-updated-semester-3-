@@ -2,7 +2,7 @@
 @section('title', 'cekout Barang')
 @section('content')
 <div class="container" style="margin-bottom:80px;">
-<div class="row text-center mb-2" style="margin-top:80px;">
+{{-- <div class="row text-center mb-2" style="margin-top:80px;">
               <div class="col-8 col col-lg-12 ">
               <h4 style="margin-bottom: 20px;"><b>Anda Memesan</b></h4>
                 <div class="card">
@@ -54,7 +54,21 @@
 
 
 
+ --}}
+ <br>
+ <br>
+ <br>
+ @foreach ($nama_menus as $menu)
+ <p>{{ $menu['nama_menu'] }} - Harga: {{ $menu['harga_menu']  }} - jumlah beli: {{ $menu['jumlah_beli']  }}</p>
 
+@endforeach
+@php
+    $total_harga = 0; // Variabel untuk mengakumulasikan total harga
 
+foreach ($nama_menus as $menu) {
+    $total_harga += $menu['harga_menu'] * $menu['jumlah_beli'];
+}
+echo "Total Harga: " . $total_harga;
+@endphp
 
 @endsection

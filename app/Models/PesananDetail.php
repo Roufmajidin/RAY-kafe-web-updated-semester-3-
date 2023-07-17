@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class PesananDetail extends Model
 {
+    protected $table = 'pesanan_details';
     protected $fillable = [
 
         'user_id',
         'pesanan_id',
-        'id',
         'menu_id',
         'jumlah_beli',
         'jumlah_harga',
@@ -20,7 +20,8 @@ class PesananDetail extends Model
         'qr_code',
         'created_at',
         'no_meja',
-        'updated_at'];
+        'updated_at'
+    ];
     public function menu()
     {
         return $this->belongsTo('App\Models\Menu', 'menu_id', 'id');

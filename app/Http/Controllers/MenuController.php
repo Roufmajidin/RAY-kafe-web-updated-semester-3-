@@ -118,14 +118,32 @@ class MenuController extends Controller
     }
     public function cekout()
     {
-        $pesanan = Pesanan::where('user_id', Auth::user()->id)->where('status', 0)->first();
-        $pesanan_details = PesananDetail::where('pesanan_id', $pesanan->id)->get();
+        // $pesanan = Pesanan::where('user_id', Auth::user()->id)->where('status', 0)->first();
+        $pesanan_details = PesananDetail::where('user_id', Auth::user()->id)->get();
 
         // $pesanan_details = [];
+        foreach ($pesanan_details as $pesanan) {
+            $pesanan_details = PesananDetail::where('user_id',  Auth::user()->id)->where('status', 0)->get();
+            $nama_menus = [];
+            foreach ($pesanan_details as $pesanan_detail) {
+                $menu = Menu::find($pesanan_detail->menu_id);
+                $nama_menu = $menu->nama_menu;
+                $harga_menu = $menu->harga;
+                $jumlah_beli = $pesanan_detail->jumlah_beli;
+                $nama_menus[] = [
+                    'nama_menu' => $nama_menu,
+                    'harga_menu' => $harga_menu,
+                    'jumlah_beli' => $jumlah_beli
+                ];
+                // dd($nama_menu);
+            }
+        }
+        // dd($pesanan_details);
 
         Toastr::info('Tunggu Beberapa saat yak ..', 'Hi ..', ["positionClass" => "toast-top-right"]);
 
-        return view ('pesanan.cekout', compact('pesanan', 'pesanan_details'));
+        // return view ('pesanan.cekout', compact('pesananpesanan', 'pesanan_details'));
+        return view ('pesanan.cekout', compact('nama_menus'));
     }
     public function struk()
     {

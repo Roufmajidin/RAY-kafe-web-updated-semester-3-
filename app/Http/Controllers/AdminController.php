@@ -65,12 +65,8 @@ class AdminController extends Controller
     }
     public function ambil($id)
     {
-        $p = PesananDetail::find($id)->get();
-        // $pp = $p->id;
-
-
-        // $p
-        // dd($p);
+        $p = PesananDetail::with('pesanan', 'menu')->find($id)->get();
+// dd($p);
         return response()->json($p);
 
         // return view('admin.scan', compact('p'));
@@ -94,12 +90,34 @@ class AdminController extends Controller
 
     public function data_pesanan()
     {
-        $menu = Menu::all();
-        $user = User::all();
-        $pesanan_detail = PesananDetail::orderBy('no_meja','desc')->get();
-        $pesanan = Pesanan::all();
+        $pesanan_details = PesananDetail::where('status', 0)->get();
 
-        return view('admin.pesanan_pelanggan', compact( 'user', 'pesanan_detail', 'pesanan'));
+    $nama_menus = [];
+
+    foreach ($pesanan_details as $pesanan_detail) {
+        $menu = Menu::find($pesanan_detail->menu_id);
+
+        $nama_menu = $menu->nama_menu;
+        $harga_menu = $menu->harga;
+        $jumlah_beli = $pesanan_detail->jumlah_beli;
+        $no_meja = $pesanan_detail->no_meja;
+
+        if (!isset($nama_menus[$no_meja])) {
+            $nama_menus[$no_meja] = [];
+        }
+
+        $nama_menus[$no_meja][] = [
+            'nama_menu' => $nama_menu,
+            'harga_menu' => $harga_menu,
+            'jumlah_beli' => $jumlah_beli,
+            'no_meja' => $no_meja
+        ];
+    }
+
+    // dd($nama_m   enus);
+
+    // dd($nama_menus);
+        return view('admin.pesanan_pelanggan', compact('nama_menus'));
     }
 
     public function store_menu(Request $request)
