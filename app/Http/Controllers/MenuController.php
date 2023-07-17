@@ -77,7 +77,7 @@ class MenuController extends Controller
     	if(empty($cek_pesanan_detail))
     	{
             $uniq_id = random_int(100000, 999999);
-            $qr = QrCode::Size(200)->generate($uniq_id);
+            $qr = QrCode::Size(200)->generate(Auth::user()->id);
             // dd($qr);
     		$pesanan_detail = new PesananDetail;
 
@@ -99,6 +99,8 @@ class MenuController extends Controller
 
     	}
         else {
+            $qr = QrCode::Size(200)->generate(Auth::user()->id);
+
             $pesanan_detail = PesananDetail::where('menu_id', $menu->id)->where('pesanan_id', $pesanan_baru->id)->first();
             $pesanan_detail->jumlah_harga = $request->jumlah_pesan + $pesanan_detail->jumlah_harga;
             $pesanan_detail->jumlah_beli = $request->jumlah_pesan + $pesanan_detail->jumlah_beli;
@@ -107,6 +109,8 @@ class MenuController extends Controller
             $input->is_bayar = $pesanan_detail->is_bayar;
 
             $pesanan_detail->jumlah_harga = $pesanan_detail->jumlah_harga + $pesanan_detail_baru;
+	    	$pesanan_detail->qr_code = $qr;
+
             $pesanan_detail->update();
 
         }
@@ -122,6 +126,11 @@ class MenuController extends Controller
         $pesanan_details = PesananDetail::where('user_id', Auth::user()->id)->get();
 
         // $pesanan_details = [];
+       if ($pesanan_details->isEmpty()) {
+        # code...
+        $nama_menus = [];
+
+       } else {
         foreach ($pesanan_details as $pesanan) {
             $pesanan_details = PesananDetail::where('user_id',  Auth::user()->id)->where('status', 0)->get();
             $nama_menus = [];
@@ -130,14 +139,20 @@ class MenuController extends Controller
                 $nama_menu = $menu->nama_menu;
                 $harga_menu = $menu->harga;
                 $jumlah_beli = $pesanan_detail->jumlah_beli;
+                $status = $pesanan_detail->status;
+                $qr = $pesanan_detail->qr_code;
                 $nama_menus[] = [
                     'nama_menu' => $nama_menu,
                     'harga_menu' => $harga_menu,
-                    'jumlah_beli' => $jumlah_beli
+                    'jumlah_beli' => $jumlah_beli,
+                    'status' => $status,
+                    'qr' => $qr
                 ];
                 // dd($nama_menu);
             }
         }
+       }
+
         // dd($pesanan_details);
 
         Toastr::info('Tunggu Beberapa saat yak ..', 'Hi ..', ["positionClass" => "toast-top-right"]);

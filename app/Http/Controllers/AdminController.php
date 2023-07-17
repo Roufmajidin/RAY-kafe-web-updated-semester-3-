@@ -50,24 +50,61 @@ class AdminController extends Controller
     }
     public function postScan(Request $request)
     {
-        $p = PesananDetail::find($request->qr_code);
-        // $pp = $p->menu_id;
+        $user_id = $request->qr_code; // Ambil nilai qr_code dari request sebagai user_id
 
-        // dd($p);
-        // return view('admin.scan');
-        $p->is_bayar = 1;
+        $pesananDetails = PesananDetail::where('user_id', $user_id)->get();
 
-        $p->update();
-        // $p = PesananDetail::find($id)->get();
-        return response()->json([]);
+        if ($pesananDetails->isEmpty()) {
+            return response()->json(['message' => 'PesananDetail dengan user_id tersebut tidak ditemukan.'], 404);
+        }
 
+        foreach ($pesananDetails as $pesananDetail) {
+            $pesananDetail->is_bayar = 1; // Update is_bayar menjadi 1
+            $pesananDetail->save(); // Simpan perubahan ke database
+        }
 
+        return response()->json(['message' => 'Data PesananDetail berhasil diperbarui.']);
     }
     public function ambil($id)
     {
-        $p = PesananDetail::with('pesanan', 'menu')->find($id)->get();
-// dd($p);
-        return response()->json($p);
+        // hehe
+        // TODO next berdasarkan pesanan baru dan isLogin pada Meja
+         // $pesanan = Pesanan::where('user_id', Auth::user()->id)->where('status', 0)->first();
+         $pesanan_details = PesananDetail::where('user_id',$id)->get();
+
+         // $pesanan_details = [];
+        if ($pesanan_details->isEmpty()) {
+         # code...
+         $nama_menus = [];
+
+        } else {
+         foreach ($pesanan_details as $pesanan) {
+             $pesanan_details = PesananDetail::where('user_id',  $id)->where('status', 0)->get();
+             $nama_menus = [];
+             foreach ($pesanan_details as $pesanan_detail) {
+                 $menu = Menu::find($pesanan_detail->menu_id);
+                 $nama_menu = $menu->nama_menu;
+                 $harga_menu = $menu->harga;
+                 $jumlah_beli = $pesanan_detail->jumlah_beli;
+                 $status = $pesanan_detail->status;
+                 $qr = $pesanan_detail->qr_code;
+                 $nama_menus[] = [
+                     'nama_menu' => $nama_menu,
+                     'harga_menu' => $harga_menu,
+                     'jumlah_beli' => $jumlah_beli,
+                     'status' => $status,
+                     'qr' => $qr
+                 ];
+                //  dd($nama_menu);
+             }
+         }
+        }
+
+         // dd($pesanan_details);
+
+        // $p = PesananDetail::with('pesanan', 'menu')->find($id)->get();
+// dd($nama_menus);
+        return response()->json($nama_menus);
 
         // return view('admin.scan', compact('p'));
     }

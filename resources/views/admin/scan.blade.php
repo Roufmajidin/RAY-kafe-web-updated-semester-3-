@@ -112,10 +112,10 @@
                     tampilan += `
                         <tr>
                             <td>${i + 1 || '-'}</td>
-                            <td>${ambilData[i].pesanan_id || '-'}</td>
+                            <td>${ambilData[i].nama_menu || '-'}</td>
+                            <td>${ambilData[i].harga_menu || '-'}</td>
                             <td>${ambilData[i].jumlah_beli || '-'}</td>
-                            <td>${ambilData[i].jumlah_harga || '-'}</td>
-                            <td>${isBayar}</td>
+                            <td>${status}</td>
                         </tr>
                     `;
                 }
